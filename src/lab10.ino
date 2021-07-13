@@ -1,44 +1,43 @@
 SYSTEM_MODE(MANUAL);
 SYSTEM_THREAD(ENABLED);
 #include <Wire.h>
-
-
-
-
-void setup() {
-  //set up wire, and serial
-  Serial.begin(9600);
-  Wire.begin();
-
+// setup() runs once, when the device is first turned on.
+void setup()
+{
+  pinMode(D7,OUTPUT); // led
+  pinMode(D6,INPUT); // button
+  // Put initialization like pinMode and begin functions here.
+  Wire.begin(0x2A); // Initialize as a slave with address 0x2A
+  Wire.onReceive(receiveEvent); // in setup
+  Wire.onRequest(requestEvent); // in setup
 }
-
-void loop() {
-
-  while (!Serial.isConnected()); 
-  
-  if (Serial.available()) {
-     //char x = '?'; 
-     char x = Serial.read(); 
-    Serial.println(x);
-
-  
-
-  
-  //transmit value of light to slave bus
-  if (x == '0' || x == '1')
-  {
-    Wire.beginTransmission(0x2A); // transmit to slave device 
-    Wire.write((char) x);             // sends one byte
-    Wire.endTransmission();    // stop transmitting
+char x;
+char value; // button true or false
+// revieves from master and lights up based on char value
+void receiveEvent(int howMany)
+{
+  x = Wire.read();
+  if(x == '0'){
+    digitalWrite(D7,LOW);
   }
-  //receive transmission
-  else if (x == '?')
-  {
-    //read request and print to serial
-    Wire.requestFrom(0x2a, 1);
-    char state = Wire.read();
-    Serial.print(state);
+
+  if(x == '1'){
+    digitalWrite(D7,HIGH);
   }
   
 }
+// reads the button state and sends back to master
+void requestEvent() {
+  
+  value = digitalRead(D6);  // reads the button either true or false
+  Serial.println(value); 
+  Wire.write(value);
+  
+}
+
+// loop() runs over and over again, as quickly as it can execute.
+void loop()
+{
+  
+  
 }
