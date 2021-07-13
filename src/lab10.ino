@@ -14,7 +14,7 @@ void setup() {
 
 void loop() {
 
-  while (!Serial.isConnected()); //dont start until Serial is connected
+  while (!Serial.isConnected()); 
   
   if (Serial.available()) {
      //char x = '?'; 
